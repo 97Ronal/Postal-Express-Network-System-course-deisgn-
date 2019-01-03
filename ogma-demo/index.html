@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./ogma.min.js"></script>
+  <style>
+    #graph-container { top: 0; bottom: 0; left: 0; right: 0; position: absolute; margin: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div id="graph-container"></div>
+
+<script>
+'use strict';
+
+var ogma = new Ogma({ container: 'graph-container' });
+
+ogma.generate.grid({ rows: 20, columns: 20 }).then(function(graph) {
+
+  ogma.setGraph(graph);
+
+  // Create an obstacle
+  for (var i = 2 ; i < 8 ; i++) {
+    ogma.removeNode(i * 10 + 5);
+  }
+
+  // Create a shortcut
+  ogma.addEdge({ id: 999, source: 77, target: 88 });
+
+  ogma.view.locateGraph();
+
+  // Find a shortest path
+  var nodeList = ogma.pathfinding.dijkstra(0, 99);
+
+  if (nodeList) {
+    var ids = nodeList.getId();
+
+    // Color the path
+    nodeList.forEach(function(node) {
+      node.setAttributes({ color: '#86315b'});
+
+      node.getAdjacentEdges().forEach(function(edge) {
+        if (ids.indexOf(edge.getSource()) !== -1 && ids.indexOf(edge.getTarget()) !== -1) {
+          edge.setAttributes({ color: '#86315b'});
+        }
+      });
+    });
+  }
+});
+
+</script>
+</body>
+</html>

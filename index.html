@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text.html; charset=gb2312" />
+<title>邮政网络规划设计 课设</title>
+</head>
+
+<!--引用数据开始-->
+<script src="data1.js" language="javascript"></script>
+<script src="data2.js" language="javascript"></script>
+<script src="data3.js" language="javascript"></script>
+<!--引用数据结束-->
+<!--引用函数开始-->
+<!--角度函数-->
+<script src="angel.js" language="javascript"></script>
+<!--求最远点函数-->
+<script src="farest.js" language="javascript"></script>
+<!--扇形区选点函数-->
+<script src="mychioce.js" language="javascript"></script>
+<!--体积排序函数-->
+<script src="sortvolumn.js" language="javascript"></script>
+<!--求最重货物函数函数-->
+<script src="heaviest.js" language="javascript"></script>
+<!--无时间限制下的决策函数-->
+<script src="chooseline_0.js" language="javascript"></script>
+<!--有时间条件下的决策函数-->
+<script src="chooseline_1.js" language="javascript"></script>
+<!--对选定的扇区内的货物以一次载最多为原则进行筛选-->
+<script src="fit.js" language="javascript"></script>
+<!--求剩余目的地，和物品-->
+<script src="rest.js" language="javascript"></script>
+<!--求两点距离函数（不考虑是否直接联通）-->
+<script src="distance.js" language="javascript"></script>
+<!--两点距离函数，考虑是否直接联通-->
+<script src="linedistance.js" language="javascript"></script>
+<!--迪杰斯科拉算法函数-->
+<script src="dijkstra.js" language="javascript"></script>
+<!--数组移除元素函数-->
+<script src="baoremove.js" language="javascript"></script>
+<!--引用函数结束-->
+
+<script language="javascript">
+//定义目的地的个数
+var aimnum=50;
+//定义扇形角度大小
+var bigangel=60;
+//货物员行驶速度（米/小时）
+var speed=24*1000;
+
+
+//架构函数 sendgoods为需要配送的货物， limit为决策条件： 0无时间限制，1有时间限制 
+function index(sendgoods,limit){
+//重要变量
+    //需要发送的全部物品
+var allsendgoods;
+//货物的目的地集合
+var allaim
+//剩余的货物的目的
+var restaim
+//最远点
+var farestpoint;
+//需要发送的物品中，按照最远点和扇形原则，选择点
+var mychiocestr;
+//该扇形中可以一次带走的点
+var sendnow;
+//物品的发送路线
+var sendline;
+//路线具体行走方法
+var linedetail;
+//路线长度
+var linelength=0;
+//路线时间花费时间
+var linetime;
+//定义扇区个数
+var howmany=0;
+
+//辅助变量
+//物品的发送路线的数组
+var sendline2;
+    //路线具体行走方法的数组
+var linedetail2;
+
+//初始化
+allsendgoods=sendgoods;
+restsendgoods=allsendgoods;
+
+//需要发送的货物中需要经过的目的集集合
+restaim=chooseaim(restsendgoods)
+
+document.write("解决方案如下：<br>");
+
+while(restaim.length!=0){
+        howmany+=1
+farestpoint=farest(restaim);
+mychiocestr=mychoice(farestpoint,allsendgoods);
+sendnow=fit(mychiocestr);
+restaim=rest(restaim,sendnow);
+//判断决策条件
+if(limit==0){
+   sendline=chooseline_0(mygoods);
+}
+else if(limit==1){
+   sendline=chooseline_1(mygoods);
+}
+
+sendline2=sendline.split("=>")
+for(var i=1;i<sendline2.length;i++){
+linedetail+=fastway(sendline2[i-1],sendline2[i])+"=>";
+}
+linedetail=linedetail.substr(0,myb2.length-2);
+linedetail2=linedetail.split("|");
+for(var i=1;i<linedetail2.length;i++){
+linelength+=distance(linedetail2[i-1]+linedetail2[i]);
+}
+document.write("送货路线："+String(linedetail)+"<br>");
+}
+document.write("总路程（单位：米）："+String(round(linelength))+"<br>");
+document.write("总时间（单位：分钟）："+String(round(mytime(linelength)))+"<br>");
+return(false); 
+}
+</script>
+<body>
+<br><br>
+<form id="form1" name="form1" method="post" action="">
+ 点击查看解决方案：<label>
+  <input type="submit" name="button2" id="button2" value=" 第 一 题 " style="width:130px; height:40px;" onclick="index('1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30',0)" />
+  </label>
+  <label>
+   <input type="submit" name="button3" id="button3" value=" 第 二 题 " style="width:130px; height:40px;" onclick="index('1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30',1)" />
+  </label>
+</form>
+</body>
+</html>

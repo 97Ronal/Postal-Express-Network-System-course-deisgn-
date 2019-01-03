@@ -70,13 +70,6 @@ function nearestgoods(a, s) {
     mym[3] = null;
     return (mym);
   }
-  else{
-      mym[0]=m;
-    mym[1]=s;
-    mym[2]=nearby;
-    mym[3]=null;
-    return(mym);
-  }
 }
 
 

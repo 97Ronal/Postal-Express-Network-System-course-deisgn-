@@ -1,53 +1,85 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <script src="./ogma.min.js"></script>
   <style>
-    #graph-container { top: 0; bottom: 0; left: 0; right: 0; position: absolute; margin: 0; overflow: hidden; }
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+      margin: 0;
+      overflow: hidden;
+    }
   </style>
 </head>
+
 <body>
   <div id="graph-container"></div>
 
-<script>
-'use strict';
+  <script>
+    'use strict';
 
-var ogma = new Ogma({ container: 'graph-container' });
+    function randomGraph(N, E) {
+      var g = {
+        nodes: [],
+        edges: []
+      };
+      for (var i = 0; i < N; i++) {
+        g.nodes.push({
+          id: 'n' + i,
+          attributes: {
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            text: 'n' + i,
+            radius: 1 + 1 * Math.random()
+          }
+        });
+      }
+      for (var i = 0; i < E; i++) {
+        g.edges.push({
+          id: 'e' + i,
+          source: 'n' + (Math.random() * N | 0),
+          target: 'n' + (Math.random() * N | 0),
+          attributes: {
+            text: 'edge' + i
+          }
+        });
+      }
+      return g;
+    }
 
-ogma.generate.grid({ rows: 20, columns: 20 }).then(function(graph) {
+    var g = randomGraph(21, 100);
 
-  ogma.setGraph(graph);
+    var ogma = new Ogma({
+      graph: g, // load the graph at init
+      container: 'graph-container',
+      debug: true
+    });
+    ogma.view.locateGraph();
 
-  // Create an obstacle
-  for (var i = 2 ; i < 8 ; i++) {
-    ogma.removeNode(i * 10 + 5);
-  }
-
-  // Create a shortcut
-  ogma.addEdge({ id: 999, source: 77, target: 88 });
-
-  ogma.view.locateGraph();
-
-  // Find a shortest path
-  var nodeList = ogma.pathfinding.dijkstra(0, 99);
-
-  if (nodeList) {
-    var ids = nodeList.getId();
-
-    // Color the path
-    nodeList.forEach(function(node) {
-      node.setAttributes({ color: '#86315b'});
-
-      node.getAdjacentEdges().forEach(function(edge) {
-        if (ids.indexOf(edge.getSource()) !== -1 && ids.indexOf(edge.getTarget()) !== -1) {
-          edge.setAttributes({ color: '#86315b'});
+    function heightLightPathNode(sourceId, targetId) {
+      console.log(sourceId,targetId)
+      ogma.algorithms.shortestPath({
+        source: sourceId,
+        target: targetId,
+      }).then(path => {
+        if (path) {
+          path.nodes.setAttributes({
+            color: 'green'
+          });
+          path.edges.setAttributes({
+            color: 'green'
+          });
         }
       });
-    });
-  }
-});
-
-</script>
+    }
+    heightLightPathNode('n0', 'n20')
+    ogma.events.onDragEnd(()=>heightLightPathNode.call(this,'n0','n20'))
+  </script>
 </body>
+
 </html>
